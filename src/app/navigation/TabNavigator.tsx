@@ -16,77 +16,84 @@ const Tab = createBottomTabNavigator();
  * Custom Tab Bar Component
  * Matches Figma design with orange accent on light background
  */
+import { MiniPlayer } from '../../features/player/MiniPlayer';
+
+// ... other imports
+
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const insets = useSafeAreaInsets();
 
     return (
-        <View style={[styles.tabBar, { paddingBottom: Math.max(insets.bottom, spacing.sm) }]}>
-            {state.routes.map((route, index) => {
-                const { options } = descriptors[route.key];
-                const label = options.tabBarLabel !== undefined
-                    ? options.tabBarLabel
-                    : options.title !== undefined
-                        ? options.title
-                        : route.name;
+        <>
+            <MiniPlayer />
+            <View style={[styles.tabBar, { paddingBottom: Math.max(insets.bottom, spacing.sm) }]}>
+                {state.routes.map((route, index) => {
+                    const { options } = descriptors[route.key];
+                    const label = options.tabBarLabel !== undefined
+                        ? options.tabBarLabel
+                        : options.title !== undefined
+                            ? options.title
+                            : route.name;
 
-                const isFocused = state.index === index;
+                    const isFocused = state.index === index;
 
-                const onPress = () => {
-                    const event = navigation.emit({
-                        type: 'tabPress',
-                        target: route.key,
-                        canPreventDefault: true,
-                    });
+                    const onPress = () => {
+                        const event = navigation.emit({
+                            type: 'tabPress',
+                            target: route.key,
+                            canPreventDefault: true,
+                        });
 
-                    if (!isFocused && !event.defaultPrevented) {
-                        navigation.navigate(route.name);
-                    }
-                };
+                        if (!isFocused && !event.defaultPrevented) {
+                            navigation.navigate(route.name);
+                        }
+                    };
 
-                const onLongPress = () => {
-                    navigation.emit({
-                        type: 'tabLongPress',
-                        target: route.key,
-                    });
-                };
+                    const onLongPress = () => {
+                        navigation.emit({
+                            type: 'tabLongPress',
+                            target: route.key,
+                        });
+                    };
 
-                const color = isFocused ? colors.tabActive : colors.tabInactive;
+                    const color = isFocused ? colors.tabActive : colors.tabInactive;
 
-                // Render the appropriate icon
-                const renderIcon = () => {
-                    switch (route.name) {
-                        case 'Home':
-                            return <HomeIcon size={24} color={color} filled={isFocused} />;
-                        case 'Favorites':
-                            return <HeartIcon size={24} color={color} filled={isFocused} />;
-                        case 'Playlists':
-                            return <PlaylistIcon size={24} color={color} filled={isFocused} />;
-                        case 'Settings':
-                            return <SettingsIcon size={24} color={color} filled={isFocused} />;
-                        default:
-                            return null;
-                    }
-                };
+                    // Render the appropriate icon
+                    const renderIcon = () => {
+                        switch (route.name) {
+                            case 'Home':
+                                return <HomeIcon size={24} color={color} filled={isFocused} />;
+                            case 'Favorites':
+                                return <HeartIcon size={24} color={color} filled={isFocused} />;
+                            case 'Playlists':
+                                return <PlaylistIcon size={24} color={color} filled={isFocused} />;
+                            case 'Settings':
+                                return <SettingsIcon size={24} color={color} filled={isFocused} />;
+                            default:
+                                return null;
+                        }
+                    };
 
-                return (
-                    <TouchableOpacity
-                        key={route.key}
-                        accessibilityRole="button"
-                        accessibilityState={isFocused ? { selected: true } : {}}
-                        accessibilityLabel={options.tabBarAccessibilityLabel}
-                        onPress={onPress}
-                        onLongPress={onLongPress}
-                        style={styles.tabItem}
-                        activeOpacity={0.7}
-                    >
-                        {renderIcon()}
-                        <Text style={[styles.tabLabel, { color }]}>
-                            {typeof label === 'string' ? label : route.name}
-                        </Text>
-                    </TouchableOpacity>
-                );
-            })}
-        </View>
+                    return (
+                        <TouchableOpacity
+                            key={route.key}
+                            accessibilityRole="button"
+                            accessibilityState={isFocused ? { selected: true } : {}}
+                            accessibilityLabel={options.tabBarAccessibilityLabel}
+                            onPress={onPress}
+                            onLongPress={onLongPress}
+                            style={styles.tabItem}
+                            activeOpacity={0.7}
+                        >
+                            {renderIcon()}
+                            <Text style={[styles.tabLabel, { color }]}>
+                                {typeof label === 'string' ? label : route.name}
+                            </Text>
+                        </TouchableOpacity>
+                    );
+                })}
+            </View>
+        </>
     );
 }
 

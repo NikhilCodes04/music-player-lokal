@@ -1,5 +1,11 @@
 import React from 'react';
-import Svg, { Path, Circle, Rect, G } from 'react-native-svg';
+import {
+    FontAwesome,
+    MaterialIcons,
+    Feather,
+    Entypo,
+    MaterialCommunityIcons
+} from '@expo/vector-icons';
 import { colors } from '../theme';
 
 interface IconProps {
@@ -8,30 +14,13 @@ interface IconProps {
     filled?: boolean;
 }
 
+
 /**
  * Home Icon
  */
 export function HomeIcon({ size = 24, color = colors.textPrimary, filled = false }: IconProps) {
-    if (filled) {
-        return (
-            <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-                <Path
-                    d="M3 10.182V22h6v-6h6v6h6V10.182L12 2 3 10.182Z"
-                    fill={color}
-                />
-            </Svg>
-        );
-    }
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Path
-                d="M3 10.182V22h6v-6h6v6h6V10.182L12 2 3 10.182Z"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinejoin="round"
-            />
-        </Svg>
-    );
+    // Entypo Home is nice and bold
+    return <Entypo name="home" size={size} color={color} />;
 }
 
 /**
@@ -39,181 +28,143 @@ export function HomeIcon({ size = 24, color = colors.textPrimary, filled = false
  */
 export function HeartIcon({ size = 24, color = colors.textPrimary, filled = false }: IconProps) {
     if (filled) {
-        return (
-            <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-                <Path
-                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"
-                    fill={color}
-                />
-            </Svg>
-        );
+        return <FontAwesome name="heart" size={size} color={color} />;
     }
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Path
-                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinejoin="round"
-            />
-        </Svg>
-    );
+    return <FontAwesome name="heart-o" size={size} color={color} />;
 }
 
 /**
  * Playlist Icon
  */
 export function PlaylistIcon({ size = 24, color = colors.textPrimary, filled = false }: IconProps) {
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Path
-                d="M3 6h12M3 12h12M3 18h8"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinecap="round"
-            />
-            <Circle
-                cx="18"
-                cy="17"
-                r="3"
-                fill={filled ? color : 'none'}
-                stroke={color}
-                strokeWidth={2}
-            />
-            <Path
-                d="M21 17V8"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinecap="round"
-            />
-        </Svg>
-    );
+    return <MaterialIcons name="queue-music" size={size} color={color} />;
 }
 
 /**
  * Settings/Gear Icon
  */
 export function SettingsIcon({ size = 24, color = colors.textPrimary, filled = false }: IconProps) {
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Circle
-                cx="12"
-                cy="12"
-                r="3"
-                fill={filled ? color : 'none'}
-                stroke={color}
-                strokeWidth={2}
-            />
-            <Path
-                d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinecap="round"
-            />
-        </Svg>
-    );
+    return <Feather name="settings" size={size} color={color} />;
 }
 
 /**
  * Search Icon
  */
 export function SearchIcon({ size = 24, color = colors.textPrimary }: IconProps) {
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Circle
-                cx="11"
-                cy="11"
-                r="7"
-                stroke={color}
-                strokeWidth={2}
-            />
-            <Path
-                d="M21 21l-4.35-4.35"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinecap="round"
-            />
-        </Svg>
-    );
+    return <Feather name="search" size={size} color={color} />;
 }
 
 /**
  * Music Note Icon (for Logo)
  */
 export function MusicNoteIcon({ size = 24, color = colors.primary }: IconProps) {
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Path
-                d="M9 18V5l12-2v13"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-            <Circle cx="6" cy="18" r="3" fill={color} />
-            <Circle cx="18" cy="16" r="3" fill={color} />
-        </Svg>
-    );
+    return <FontAwesome name="music" size={size} color={color} />;
 }
 
 /**
  * Arrow Left Icon (Back)
  */
 export function ArrowLeftIcon({ size = 24, color = colors.textPrimary }: IconProps) {
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Path
-                d="M19 12H5M12 19l-7-7 7-7"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </Svg>
-    );
+    return <Feather name="arrow-left" size={size} color={color} />;
 }
 
 /**
  * Close Icon (X)
  */
 export function CloseIcon({ size = 24, color = colors.textPrimary }: IconProps) {
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Path
-                d="M18 6L6 18M6 6l12 12"
-                stroke={color}
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-            />
-        </Svg>
-    );
+    return <Feather name="x" size={size} color={color} />;
 }
 
 /**
- * Play Icon (Filled Circle)
+ * Chevron Up Icon (Lyrics)
  */
-export function PlayIcon({ size = 24, color = colors.primary }: IconProps) {
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Circle cx="12" cy="12" r="12" fill={color} />
-            <Path
-                d="M10 8l6 4-6 4V8z"
-                fill="white"
-            />
-        </Svg>
-    );
+export function ChevronUpIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return <Feather name="chevron-up" size={size} color={color} />;
+}
+
+/**
+ * Play Icon
+ */
+export function PlayIcon({ size = 24, color = colors.primary, filled = true }: IconProps) {
+    // FontAwesome Play is standard
+    return <FontAwesome name="play" size={size} color={color} />;
+}
+
+/**
+ * Pause Icon
+ */
+export function PauseIcon({ size = 24, color = colors.primary, filled = true }: IconProps) {
+    return <FontAwesome name="pause" size={size} color={color} />;
+}
+
+/**
+ * Skip Next Icon
+ */
+export function SkipNextIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return <FontAwesome name="step-forward" size={size} color={color} />;
+}
+
+/**
+ * Skip Previous Icon
+ */
+export function SkipPreviousIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return <FontAwesome name="step-backward" size={size} color={color} />;
+}
+
+/**
+ * Rewind 10s Icon
+ */
+export function Rewind10Icon({ size = 24, color = colors.textPrimary }: IconProps) {
+    // MaterialIcons has replay-10 which is exactly what we want
+    return <MaterialIcons name="replay-10" size={size} color={color} />;
+}
+
+/**
+ * Forward 10s Icon
+ */
+export function Forward10Icon({ size = 24, color = colors.textPrimary }: IconProps) {
+    // MaterialIcons has forward-10
+    return <MaterialIcons name="forward-10" size={size} color={color} />;
+}
+
+/**
+ * Speed Icon (Speedometer)
+ */
+export function SpeedIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return <MaterialCommunityIcons name="speedometer" size={size} color={color} />;
+}
+
+/**
+ * Timer Icon (Timer)
+ */
+export function TimerIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return <MaterialCommunityIcons name="timer-outline" size={size} color={color} />;
+}
+
+/**
+ * Cast Icon
+ */
+export function CastIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return <MaterialIcons name="cast" size={size} color={color} />;
 }
 
 /**
  * More Vertical Icon (Options)
  */
 export function MoreVerticalIcon({ size = 24, color = colors.textPrimary }: IconProps) {
-    return (
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <Circle cx="12" cy="5" r="1" fill={color} stroke={color} strokeWidth={1} />
-            <Circle cx="12" cy="12" r="1" fill={color} stroke={color} strokeWidth={1} />
-            <Circle cx="12" cy="19" r="1" fill={color} stroke={color} strokeWidth={1} />
-        </Svg>
-    );
+    return <Feather name="more-vertical" size={size} color={color} />;
+}
+
+/**
+ * Replay Icon (General)
+ */
+export function ReplayIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return <MaterialIcons name="replay" size={size} color={color} />;
+}
+
+/**
+ * Shuffle Icon
+ */
+export function ShuffleIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return <MaterialIcons name="shuffle" size={size} color={color} />;
 }

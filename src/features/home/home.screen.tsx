@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSuggestedFeed, useHomeSongs, useHomeAlbums, useHomeArtists } from './home.hooks';
+import { usePlayerStore } from '../player/player.store';
 import type { HomeTab } from './home.types';
 import type { Song, Album, Artist } from '../../services/saavn.mappers';
 import {
@@ -311,6 +312,14 @@ function formatDuration(seconds: number): string {
 // Placeholder handlers - will be connected to player store
 function handlePlaySong(song: Song) {
     console.log('Play song:', song.title);
+    usePlayerStore.getState().playTrack({
+        id: song.id,
+        url: song.url,
+        title: song.title,
+        artist: song.artist,
+        artwork: song.artwork,
+        duration: song.duration,
+    });
 }
 
 function handleAlbumPress(album: Album) {

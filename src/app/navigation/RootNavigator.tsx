@@ -6,18 +6,11 @@ import { useNavigation } from '@react-navigation/native';
 
 import { SearchScreen } from '../../features/search/search.screen';
 
-const Stack = createStackNavigator();
+import { PlayerScreen } from '../../features/player/PlayerScreen';
 
-// Placeholder Player Modal
-function PlayerModal() {
-    const navigation = useNavigation();
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
-            <Text>Player Modal</Text>
-            <Button title="Close" onPress={() => navigation.goBack()} />
-        </View>
-    );
-}
+import { QueueScreen } from '../../features/queue/QueueScreen';
+
+const Stack = createStackNavigator();
 
 export function RootNavigator() {
     return (
@@ -26,10 +19,19 @@ export function RootNavigator() {
             <Stack.Screen name="Search" component={SearchScreen} />
             <Stack.Screen
                 name="PlayerModal"
-                component={PlayerModal}
+                component={PlayerScreen}
                 options={{
                     presentation: 'modal',
+                    gestureEnabled: true,
                     // Setup for full screen modal feel
+                }}
+            />
+            <Stack.Screen
+                name="Queue"
+                component={QueueScreen}
+                options={{
+                    presentation: 'modal', // Optional: make it a modal or card
+                    gestureEnabled: true,
                 }}
             />
         </Stack.Navigator>
