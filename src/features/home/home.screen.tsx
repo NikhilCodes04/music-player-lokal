@@ -400,12 +400,12 @@ const styles = StyleSheet.create({
     },
     tabText: {
         fontSize: typography.sizes.md,
-        fontWeight: typography.weights.medium,
+        fontFamily: typography.fonts.medium,
         color: colors.textSecondary,
     },
     tabTextActive: {
         color: colors.primary,
-        fontWeight: typography.weights.semibold,
+        fontFamily: typography.fonts.semibold,
     },
     tabIndicator: {
         position: 'absolute',
@@ -453,12 +453,13 @@ const styles = StyleSheet.create({
     },
     songTitle: {
         fontSize: typography.sizes.lg,
-        fontWeight: typography.weights.medium,
+        fontFamily: typography.fonts.medium,
         color: colors.textPrimary,
         marginBottom: spacing.xs,
     },
     songArtist: {
         fontSize: typography.sizes.md,
+        fontFamily: typography.fonts.regular,
         color: colors.textSecondary,
     },
     songDuration: {
@@ -484,7 +485,7 @@ const styles = StyleSheet.create({
     },
     albumName: {
         fontSize: typography.sizes.lg, // Bigger as per design
-        fontWeight: typography.weights.bold,
+        fontFamily: typography.fonts.bold,
         color: colors.textPrimary,
         marginBottom: 2,
     },
@@ -510,7 +511,7 @@ const styles = StyleSheet.create({
     },
     tabHeaderTitle: {
         fontSize: typography.sizes.lg,
-        fontWeight: typography.weights.bold,
+        fontFamily: typography.fonts.bold,
         color: colors.textPrimary,
     },
     sortButton: {
@@ -521,7 +522,7 @@ const styles = StyleSheet.create({
         fontSize: typography.sizes.sm,
         color: colors.primary, // Orange as per design
         marginRight: spacing.xs,
-        fontWeight: typography.weights.medium,
+        fontFamily: typography.fonts.medium,
     },
     artistItem: {
         alignItems: 'center',
@@ -584,12 +585,13 @@ const styles = StyleSheet.create({
     },
     artistNameList: {
         fontSize: typography.sizes.lg,
-        fontWeight: typography.weights.bold,
+        fontFamily: typography.fonts.bold,
         color: colors.textPrimary,
         marginBottom: 2,
     },
     artistStats: {
         fontSize: typography.sizes.sm,
         color: colors.textSecondary,
+        fontFamily: typography.fonts.regular,
     },
 });

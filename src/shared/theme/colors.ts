@@ -64,6 +64,12 @@ export const typography = {
         semibold: '600' as const,
         bold: '700' as const,
     },
+    fonts: {
+        regular: 'Outfit_400Regular',
+        medium: 'Outfit_500Medium',
+        semibold: 'Outfit_600SemiBold',
+        bold: 'Outfit_700Bold',
+    },
 } as const;
 
 export const borderRadius = {

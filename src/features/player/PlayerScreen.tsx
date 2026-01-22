@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: typography.sizes.lg,
-        fontWeight: typography.weights.bold,
+        fontFamily: typography.fonts.bold,
         color: colors.textPrimary,
         // center?
         position: 'absolute',
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: typography.sizes.xxl,
-        fontWeight: typography.weights.bold,
+        fontFamily: typography.fonts.bold,
         color: colors.textPrimary,
         marginBottom: 4,
         textAlign: 'center', // Center text
@@ -245,6 +245,7 @@ const styles = StyleSheet.create({
         fontSize: typography.sizes.md,
         color: colors.textSecondary,
         textAlign: 'center', // Center text
+        fontFamily: typography.fonts.medium,
     },
     progressContainer: {
         marginBottom: spacing.xl,
@@ -257,6 +258,7 @@ const styles = StyleSheet.create({
     timeText: {
         fontSize: typography.sizes.xs,
         color: colors.textMuted,
+        fontFamily: typography.fonts.medium, // Monospace-ish often better but Outfit Medium is fine
     },
     controls: {
         flexDirection: 'row',
