@@ -6,6 +6,7 @@ import { HomeScreen } from '../../features/home/home.screen';
 import { FavoritesScreen } from '../../features/favorites/favorites.screen';
 import { PlaylistsScreen } from '../../features/playlists/playlists.screen';
 import { SettingsScreen } from '../../features/settings/settings.screen';
+import { SearchScreen } from '../../features/search/search.screen';
 import { HomeIcon, HeartIcon, PlaylistIcon, SettingsIcon } from '../../shared/components';
 import { colors, spacing } from '../../shared/theme';
 

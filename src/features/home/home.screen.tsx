@@ -10,6 +10,7 @@ import {
     Dimensions,
     ScrollView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useSuggestedFeed, useHomeSongs, useHomeAlbums, useHomeArtists } from './home.hooks';
 import type { HomeTab } from './home.types';
 import type { Song, Album, Artist } from '../../services/saavn.mappers';
@@ -25,12 +26,13 @@ const { width } = Dimensions.get('window');
 const TABS: HomeTab[] = ['suggested', 'songs', 'artists', 'albums'];
 
 export function HomeScreen() {
+    const navigation = useNavigation<any>();
     const [activeTab, setActiveTab] = useState<HomeTab>('suggested');
 
     return (
         <View style={styles.container}>
             {/* App Header */}
-            <AppHeader onSearchPress={() => console.log('Search pressed')} />
+            <AppHeader onSearchPress={() => navigation.navigate('Search')} />
 
             {/* Content Tabs */}
             <View style={styles.tabBar}>
@@ -79,8 +81,10 @@ function SuggestedTab() {
     if (isSongsError) return <ErrorView onRetry={refetchSongs} />;
 
     // Splitting songs for different sections to mimic a real feed
-    const recentlyPlayed = suggestedSongs.slice(0, 5);
-    const mostPlayed = suggestedSongs.slice(5, 10);
+    // Ensure we have data before slicing
+    const safeSongs = suggestedSongs || [];
+    const recentlyPlayed = safeSongs.slice(0, 5);
+    const mostPlayed = safeSongs.slice(5, 10);
 
     return (
         <ScrollView
@@ -119,7 +123,7 @@ function SuggestedTab() {
                 />
                 <FlatList
                     horizontal
-                    data={artists.slice(0, 10)}
+                    data={artists ? artists.slice(0, 10) : []}
                     keyExtractor={(item) => `artist-${item.id}`}
                     renderItem={({ item }) => (
                         <HorizontalArtistCard

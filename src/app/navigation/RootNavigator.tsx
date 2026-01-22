@@ -4,6 +4,8 @@ import { TabNavigator } from './TabNavigator';
 import { View, Text, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+import { SearchScreen } from '../../features/search/search.screen';
+
 const Stack = createStackNavigator();
 
 // Placeholder Player Modal
@@ -19,8 +21,9 @@ function PlayerModal() {
 
 export function RootNavigator() {
     return (
-        <Stack.Navigator screenOptions={{ headerShown: false, presentation: 'modal' }}>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="MainTabs" component={TabNavigator} />
+            <Stack.Screen name="Search" component={SearchScreen} />
             <Stack.Screen
                 name="PlayerModal"
                 component={PlayerModal}

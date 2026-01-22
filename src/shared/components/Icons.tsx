@@ -155,3 +155,65 @@ export function MusicNoteIcon({ size = 24, color = colors.primary }: IconProps) 
         </Svg>
     );
 }
+
+/**
+ * Arrow Left Icon (Back)
+ */
+export function ArrowLeftIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+            <Path
+                d="M19 12H5M12 19l-7-7 7-7"
+                stroke={color}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </Svg>
+    );
+}
+
+/**
+ * Close Icon (X)
+ */
+export function CloseIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+            <Path
+                d="M18 6L6 18M6 6l12 12"
+                stroke={color}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </Svg>
+    );
+}
+
+/**
+ * Play Icon (Filled Circle)
+ */
+export function PlayIcon({ size = 24, color = colors.primary }: IconProps) {
+    return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+            <Circle cx="12" cy="12" r="12" fill={color} />
+            <Path
+                d="M10 8l6 4-6 4V8z"
+                fill="white"
+            />
+        </Svg>
+    );
+}
+
+/**
+ * More Vertical Icon (Options)
+ */
+export function MoreVerticalIcon({ size = 24, color = colors.textPrimary }: IconProps) {
+    return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+            <Circle cx="12" cy="5" r="1" fill={color} stroke={color} strokeWidth={1} />
+            <Circle cx="12" cy="12" r="1" fill={color} stroke={color} strokeWidth={1} />
+            <Circle cx="12" cy="19" r="1" fill={color} stroke={color} strokeWidth={1} />
+        </Svg>
+    );
+}
