@@ -8,10 +8,18 @@ import {
     StyleSheet,
     ActivityIndicator,
     Dimensions,
+    ScrollView,
 } from 'react-native';
 import { useSuggestedFeed, useHomeSongs, useHomeAlbums, useHomeArtists } from './home.hooks';
 import type { HomeTab } from './home.types';
 import type { Song, Album, Artist } from '../../services/saavn.mappers';
+import {
+    AppHeader,
+    SectionHeader,
+    HorizontalCard,
+    HorizontalArtistCard
+} from '../../shared/components';
+import { colors, spacing, typography, borderRadius } from '../../shared/theme';
 
 const { width } = Dimensions.get('window');
 const TABS: HomeTab[] = ['suggested', 'songs', 'artists', 'albums'];
@@ -21,24 +29,33 @@ export function HomeScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <Text style={styles.headerTitle}>Music</Text>
-            </View>
+            {/* App Header */}
+            <AppHeader onSearchPress={() => console.log('Search pressed')} />
 
-            {/* Tab Bar */}
+            {/* Content Tabs */}
             <View style={styles.tabBar}>
-                {TABS.map((tab) => (
-                    <TouchableOpacity
-                        key={tab}
-                        style={[styles.tab, activeTab === tab && styles.tabActive]}
-                        onPress={() => setActiveTab(tab)}
-                    >
-                        <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                        </Text>
-                    </TouchableOpacity>
-                ))}
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.tabScrollContent}
+                >
+                    {TABS.map((tab) => (
+                        <TouchableOpacity
+                            key={tab}
+                            style={styles.tab}
+                            onPress={() => setActiveTab(tab)}
+                            activeOpacity={0.7}
+                        >
+                            <Text style={[
+                                styles.tabText,
+                                activeTab === tab && styles.tabTextActive
+                            ]}>
+                                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                            </Text>
+                            {activeTab === tab && <View style={styles.tabIndicator} />}
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
             </View>
 
             {/* Tab Content */}
@@ -55,19 +72,90 @@ export function HomeScreen() {
 // --- Tab Components ---
 
 function SuggestedTab() {
-    const { songs, isLoading, isError, refetch } = useSuggestedFeed();
+    const { songs: suggestedSongs, isLoading: isSongsLoading, isError: isSongsError, refetch: refetchSongs } = useSuggestedFeed();
+    const { artists, isLoading: isArtistsLoading } = useHomeArtists();
 
-    if (isLoading) return <LoadingView />;
-    if (isError) return <ErrorView onRetry={refetch} />;
+    if (isSongsLoading || isArtistsLoading) return <LoadingView />;
+    if (isSongsError) return <ErrorView onRetry={refetchSongs} />;
+
+    // Splitting songs for different sections to mimic a real feed
+    const recentlyPlayed = suggestedSongs.slice(0, 5);
+    const mostPlayed = suggestedSongs.slice(5, 10);
 
     return (
-        <FlatList
-            data={songs}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <SongItem song={item} onPress={() => handlePlaySong(item)} />}
-            contentContainerStyle={styles.listContent}
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
-        />
+        >
+            {/* Recently Played Section */}
+            <View style={styles.section}>
+                <SectionHeader
+                    title="Recently Played"
+                    onSeeAll={() => console.log('See all recently played')}
+                />
+                <FlatList
+                    horizontal
+                    data={recentlyPlayed}
+                    keyExtractor={(item) => `recent-${item.id}`}
+                    renderItem={({ item }) => (
+                        <HorizontalCard
+                            title={item.title}
+                            subtitle={item.artist}
+                            image={item.artwork}
+                            onPress={() => handlePlaySong(item)}
+                        />
+                    )}
+                    contentContainerStyle={styles.horizontalListContent}
+                    showsHorizontalScrollIndicator={false}
+                />
+            </View>
+
+            {/* Artists Section */}
+            <View style={styles.section}>
+                <SectionHeader
+                    title="Artists"
+                    onSeeAll={() => console.log('See all artists')}
+                />
+                <FlatList
+                    horizontal
+                    data={artists.slice(0, 10)}
+                    keyExtractor={(item) => `artist-${item.id}`}
+                    renderItem={({ item }) => (
+                        <HorizontalArtistCard
+                            name={item.name}
+                            image={item.image}
+                            onPress={() => handleArtistPress(item)}
+                        />
+                    )}
+                    contentContainerStyle={styles.horizontalListContent}
+                    showsHorizontalScrollIndicator={false}
+                />
+            </View>
+
+            {/* Most Played Section */}
+            <View style={styles.section}>
+                <SectionHeader
+                    title="Most Played"
+                    onSeeAll={() => console.log('See all most played')}
+                />
+                <FlatList
+                    horizontal
+                    data={mostPlayed}
+                    keyExtractor={(item) => `most-${item.id}`}
+                    renderItem={({ item }) => (
+                        <HorizontalCard
+                            title={item.title}
+                            subtitle={item.artist}
+                            image={item.artwork}
+                            onPress={() => handlePlaySong(item)}
+                        />
+                    )}
+                    contentContainerStyle={styles.horizontalListContent}
+                    showsHorizontalScrollIndicator={false}
+                />
+            </View>
+        </ScrollView>
     );
 }
 
@@ -86,7 +174,7 @@ function SongsTab() {
             showsVerticalScrollIndicator={false}
             onEndReached={() => hasNextPage && fetchNextPage()}
             onEndReachedThreshold={0.5}
-            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color="#1DB954" /> : null}
+            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
         />
     );
 }
@@ -107,7 +195,7 @@ function AlbumsTab() {
             showsVerticalScrollIndicator={false}
             onEndReached={() => hasNextPage && fetchNextPage()}
             onEndReachedThreshold={0.5}
-            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color="#1DB954" /> : null}
+            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
         />
     );
 }
@@ -128,7 +216,7 @@ function ArtistsTab() {
             showsVerticalScrollIndicator={false}
             onEndReached={() => hasNextPage && fetchNextPage()}
             onEndReachedThreshold={0.5}
-            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color="#1DB954" /> : null}
+            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
         />
     );
 }
@@ -191,7 +279,7 @@ function ArtistItem({ artist, onPress }: ArtistItemProps) {
 function LoadingView() {
     return (
         <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#1DB954" />
+            <ActivityIndicator size="large" color={colors.primary} />
         </View>
     );
 }
@@ -219,17 +307,14 @@ function formatDuration(seconds: number): string {
 // Placeholder handlers - will be connected to player store
 function handlePlaySong(song: Song) {
     console.log('Play song:', song.title);
-    // TODO: Replace queue and start playback via player store
 }
 
 function handleAlbumPress(album: Album) {
     console.log('Navigate to album:', album.name);
-    // TODO: Navigate to album detail screen
 }
 
 function handleArtistPress(artist: Artist) {
     console.log('Navigate to artist:', artist.name);
-    // TODO: Navigate to artist detail screen
 }
 
 // --- Styles ---
@@ -237,117 +322,124 @@ function handleArtistPress(artist: Artist) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#121212',
-    },
-    header: {
-        paddingHorizontal: 16,
-        paddingTop: 48,
-        paddingBottom: 16,
-    },
-    headerTitle: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
+        backgroundColor: colors.background,
     },
     tabBar: {
-        flexDirection: 'row',
-        paddingHorizontal: 16,
-        marginBottom: 16,
+        backgroundColor: colors.background,
+        borderBottomWidth: 0,
+        marginBottom: spacing.xs,
+    },
+    tabScrollContent: {
+        paddingHorizontal: spacing.lg,
+        gap: spacing.xl,
     },
     tab: {
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        marginRight: 8,
-        borderRadius: 20,
-        backgroundColor: '#282828',
-    },
-    tabActive: {
-        backgroundColor: '#1DB954',
+        paddingVertical: spacing.sm,
+        position: 'relative',
     },
     tabText: {
-        fontSize: 14,
-        color: '#B3B3B3',
-        fontWeight: '600',
+        fontSize: typography.sizes.md,
+        fontWeight: typography.weights.medium,
+        color: colors.textSecondary,
     },
     tabTextActive: {
-        color: '#FFFFFF',
+        color: colors.primary,
+        fontWeight: typography.weights.semibold,
+    },
+    tabIndicator: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 2,
+        backgroundColor: colors.primary,
+        borderRadius: 1,
     },
     content: {
         flex: 1,
     },
+    scrollContent: {
+        paddingBottom: 100,
+    },
+    section: {
+        marginBottom: spacing.xl,
+    },
+    horizontalListContent: {
+        paddingHorizontal: spacing.lg,
+    },
     listContent: {
-        paddingHorizontal: 16,
+        paddingHorizontal: spacing.lg,
         paddingBottom: 100,
     },
     gridContent: {
-        paddingHorizontal: 16,
+        paddingHorizontal: spacing.lg,
         paddingBottom: 100,
     },
     songItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 8,
+        paddingVertical: spacing.sm,
     },
     songArtwork: {
         width: 56,
         height: 56,
-        borderRadius: 4,
-        backgroundColor: '#282828',
+        borderRadius: borderRadius.sm,
+        backgroundColor: colors.surface,
     },
     songInfo: {
         flex: 1,
-        marginLeft: 12,
+        marginLeft: spacing.md,
     },
     songTitle: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: '#FFFFFF',
-        marginBottom: 4,
+        fontSize: typography.sizes.lg,
+        fontWeight: typography.weights.medium,
+        color: colors.textPrimary,
+        marginBottom: spacing.xs,
     },
     songArtist: {
-        fontSize: 14,
-        color: '#B3B3B3',
+        fontSize: typography.sizes.md,
+        color: colors.textSecondary,
     },
     songDuration: {
-        marginLeft: 12,
+        marginLeft: spacing.md,
     },
     durationText: {
-        fontSize: 13,
-        color: '#B3B3B3',
+        fontSize: typography.sizes.sm,
+        color: colors.textMuted,
     },
     albumItem: {
-        marginBottom: 16,
-        marginRight: 16,
+        marginBottom: spacing.lg,
+        marginRight: spacing.lg,
     },
     albumArtwork: {
-        borderRadius: 4,
-        backgroundColor: '#282828',
-        marginBottom: 8,
+        borderRadius: borderRadius.md,
+        backgroundColor: colors.surface,
+        marginBottom: spacing.sm,
     },
     albumName: {
-        fontSize: 14,
-        fontWeight: '500',
-        color: '#FFFFFF',
-        marginBottom: 2,
+        fontSize: typography.sizes.md,
+        fontWeight: typography.weights.medium,
+        color: colors.textPrimary,
+        marginBottom: spacing.xs,
     },
     albumArtist: {
-        fontSize: 12,
-        color: '#B3B3B3',
+        fontSize: typography.sizes.sm,
+        color: colors.textSecondary,
     },
     artistItem: {
         alignItems: 'center',
-        marginBottom: 16,
-        marginRight: 16,
+        marginBottom: spacing.lg,
+        marginRight: spacing.lg,
     },
     artistImage: {
         borderRadius: 100,
-        backgroundColor: '#282828',
-        marginBottom: 8,
+        backgroundColor: colors.surface,
+        marginBottom: spacing.sm,
     },
     artistName: {
-        fontSize: 13,
-        fontWeight: '500',
-        color: '#FFFFFF',
+        fontSize: typography.sizes.sm,
+        fontWeight: typography.weights.medium,
+        color: colors.textPrimary,
         textAlign: 'center',
     },
     centered: {
@@ -356,25 +448,25 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     errorText: {
-        fontSize: 16,
-        color: '#B3B3B3',
-        marginBottom: 8,
+        fontSize: typography.sizes.lg,
+        color: colors.textSecondary,
+        marginBottom: spacing.sm,
     },
     errorDetail: {
-        fontSize: 12,
-        color: '#888',
-        marginBottom: 16,
-        paddingHorizontal: 20,
+        fontSize: typography.sizes.sm,
+        color: colors.textMuted,
+        marginBottom: spacing.lg,
+        paddingHorizontal: spacing.xl,
         textAlign: 'center',
     },
     retryButton: {
-        backgroundColor: '#1DB954',
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 20,
+        backgroundColor: colors.primary,
+        paddingHorizontal: spacing.xxl,
+        paddingVertical: spacing.md,
+        borderRadius: borderRadius.round,
     },
     retryText: {
-        color: '#FFFFFF',
-        fontWeight: '600',
+        color: colors.textOnPrimary,
+        fontWeight: typography.weights.semibold,
     },
 });
