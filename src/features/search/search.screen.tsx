@@ -44,7 +44,7 @@ export function SearchScreen() {
         isFetchingNextPage
     } = useSearch(debouncedQuery, activeFilter);
 
-    const { history, addToHistory, removeFromHistory } = useRecentSearches();
+    const { history, addToHistory, removeFromHistory, clearHistory } = useRecentSearches();
 
     const handleClear = () => {
         setQuery('');
@@ -121,6 +121,8 @@ export function SearchScreen() {
         );
     };
 
+
+
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
             <SearchBar
@@ -163,14 +165,25 @@ export function SearchScreen() {
                         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
                     />
                 ) : query.length > 0 ? (
+                    // Not Found State
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <View style={styles.center}>
-                            <Text style={styles.emptyText}>No results found for "{query}"</Text>
+                        <View style={styles.notFoundContainer}>
+                            {/* Placeholder for the illustration - Using Emoji for now to match vibe */}
+                            <Text style={{ fontSize: 120, marginBottom: spacing.lg }}>😔</Text>
+                            <Text style={styles.notFoundTitle}>Not Found</Text>
+                            <Text style={styles.notFoundText}>
+                                Sorry, the keyword you entered cannot be found, please check again or search with another keyword.
+                            </Text>
                         </View>
                     </TouchableWithoutFeedback>
                 ) : history.length > 0 ? (
                     <View style={styles.historyContainer}>
-                        <Text style={styles.sectionTitle}>Recent Searches</Text>
+                        <View style={styles.historyHeader}>
+                            <Text style={styles.sectionTitle}>Recent Searches</Text>
+                            <TouchableOpacity onPress={clearHistory}>
+                                <Text style={styles.clearAllText}>Clear All</Text>
+                            </TouchableOpacity>
+                        </View>
                         <FlatList
                             data={history}
                             keyExtractor={(item) => item}
@@ -180,11 +193,10 @@ export function SearchScreen() {
                                         style={styles.historyTextContainer}
                                         onPress={() => handleHistoryPress(item)}
                                     >
-                                        <ReplayIcon size={20} color={colors.textSecondary} />
                                         <Text style={styles.historyText}>{item}</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity onPress={() => removeFromHistory(item)} style={styles.removeHistoryBtn}>
-                                        <CloseIcon size={18} color={colors.textMuted} />
+                                        <CloseIcon size={20} color={colors.textMuted} />
                                     </TouchableOpacity>
                                 </View>
                             )}
@@ -232,24 +244,53 @@ const styles = StyleSheet.create({
         color: colors.textSecondary,
         fontFamily: typography.fonts.regular,
     },
+    notFoundContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: spacing.xxl,
+    },
+    notFoundTitle: {
+        fontSize: typography.sizes.xxl,
+        fontFamily: typography.fonts.bold,
+        color: colors.textPrimary,
+        marginBottom: spacing.sm,
+    },
+    notFoundText: {
+        fontSize: typography.sizes.md,
+        fontFamily: typography.fonts.regular,
+        color: colors.textSecondary,
+        textAlign: 'center',
+        lineHeight: 22,
+    },
     historyContainer: {
         flex: 1,
+    },
+    historyHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingRight: spacing.lg,
+        marginTop: spacing.md,
+        marginBottom: spacing.sm,
     },
     sectionTitle: {
         fontSize: typography.sizes.md,
         fontFamily: typography.fonts.bold,
         color: colors.textPrimary,
         marginLeft: spacing.lg,
-        marginTop: spacing.md,
-        marginBottom: spacing.sm,
+    },
+    clearAllText: {
+        fontSize: typography.sizes.md,
+        fontFamily: typography.fonts.bold,
+        color: colors.primary, // Orange
     },
     historyItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingVertical: spacing.md,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.surface,
+        paddingHorizontal: spacing.lg,
     },
     historyTextContainer: {
         flex: 1,
@@ -259,8 +300,7 @@ const styles = StyleSheet.create({
     historyText: {
         fontSize: typography.sizes.md,
         fontFamily: typography.fonts.regular,
-        color: colors.textPrimary,
-        marginLeft: spacing.md,
+        color: colors.textSecondary, // Muted look as per screenshot
     },
     removeHistoryBtn: {
         padding: spacing.sm,
