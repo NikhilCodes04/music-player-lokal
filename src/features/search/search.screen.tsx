@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
     View,
     FlatList,
@@ -7,7 +7,8 @@ import {
     Text,
     ScrollView,
     Keyboard,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback,
+    TouchableOpacity
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -15,21 +16,24 @@ import {
     FilterPill,
     SearchResultItem
 } from '../../shared/components';
+import { CloseIcon, ReplayIcon } from '../../shared/components/Icons';
+import { useDebounce } from '../../shared/hooks/useDebounce';
+import { useRecentSearches } from './useRecentSearches';
 import { useSearch } from './search.hooks';
 import type { SearchFilter } from './search.types';
 import type { Song, Album, Artist } from '../../services/saavn.mappers';
-import { colors, spacing, typography } from '../../shared/theme';
+import { colors, spacing, typography } from '../../shared/theme/colors';
 
 const FILTERS: { label: string; value: SearchFilter }[] = [
     { label: 'Songs', value: 'songs' },
     { label: 'Artists', value: 'artists' },
     { label: 'Albums', value: 'albums' },
-    // { label: 'Folders', value: 'playlists' }, 
 ];
 
 export function SearchScreen() {
     const insets = useSafeAreaInsets();
     const [query, setQuery] = useState('');
+    const debouncedQuery = useDebounce(query, 500);
     const [activeFilter, setActiveFilter] = useState<SearchFilter>('songs');
 
     const {
@@ -38,7 +42,9 @@ export function SearchScreen() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage
-    } = useSearch(query, activeFilter);
+    } = useSearch(debouncedQuery, activeFilter);
+
+    const { history, addToHistory, removeFromHistory } = useRecentSearches();
 
     const handleClear = () => {
         setQuery('');
@@ -47,6 +53,20 @@ export function SearchScreen() {
 
     const handleBack = () => {
         console.log('Navigate back');
+    };
+
+    const handleResultPress = (item: Song | Album | Artist) => {
+        if (query.trim()) {
+            addToHistory(query);
+        } else {
+            if ('title' in item && item.title) addToHistory(item.title);
+            else if ('name' in item && item.name) addToHistory(item.name);
+        }
+        console.log('Press', item.id);
+    };
+
+    const handleHistoryPress = (term: string) => {
+        setQuery(term);
     };
 
     const renderItem = ({ item }: { item: Song | Album | Artist }) => {
@@ -60,9 +80,7 @@ export function SearchScreen() {
             subtitle = item.artist;
             image = item.artwork;
         } else if ('year' in item) {
-            // It's an Album (assuming Album has year or we check strict keys)
-            // simplified check: if it has name and NOT generic artist props maybe?
-            // Safest is to check keys present in specific interfaces
+            // It's an Album
             const album = item as Album;
             title = album.name;
             subtitle = album.artist || 'Album';
@@ -75,22 +93,20 @@ export function SearchScreen() {
             image = artist.image;
         }
 
-        // To be safe with the activeFilter context:
+        // Contextual overrides if needed based on activeFilter
         if (activeFilter === 'songs') {
             const song = item as Song;
-            title = song.title || '';
-            subtitle = song.artist || '';
-            image = song.artwork || '';
+            title = song.title || title;
+            subtitle = song.artist || subtitle;
         } else if (activeFilter === 'albums') {
             const album = item as Album;
-            title = album.name || '';
-            subtitle = album.artist || '';
-            image = album.artwork || '';
+            title = album.name || title;
+            subtitle = album.artist || subtitle;
         } else if (activeFilter === 'artists') {
             const artist = item as Artist;
-            title = artist.name || '';
+            title = artist.name || title;
+            image = artist.image || image;
             subtitle = 'Artist';
-            image = artist.image || '';
         }
 
         return (
@@ -98,7 +114,7 @@ export function SearchScreen() {
                 title={title}
                 subtitle={subtitle}
                 image={image}
-                onPress={() => console.log('Press', item.id)}
+                onPress={() => handleResultPress(item)}
                 onPlayPress={() => console.log('Play', item.id)}
                 onOptionsPress={() => console.log('Options', item.id)}
             />
@@ -107,7 +123,6 @@ export function SearchScreen() {
 
     return (
         <View style={[styles.container, { paddingTop: insets.top }]}>
-            {/* Search Header */}
             <SearchBar
                 value={query}
                 onChangeText={setQuery}
@@ -115,7 +130,6 @@ export function SearchScreen() {
                 onBack={handleBack}
             />
 
-            {/* Filters */}
             <View style={styles.filterContainer}>
                 <ScrollView
                     horizontal
@@ -133,7 +147,6 @@ export function SearchScreen() {
                 </ScrollView>
             </View>
 
-            {/* Results */}
             <View style={styles.content}>
                 {isLoading ? (
                     <View style={styles.center}>
@@ -149,12 +162,36 @@ export function SearchScreen() {
                         onEndReachedThreshold={0.5}
                         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
                     />
-                ) : query.length >= 2 ? (
+                ) : query.length > 0 ? (
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                         <View style={styles.center}>
                             <Text style={styles.emptyText}>No results found for "{query}"</Text>
                         </View>
                     </TouchableWithoutFeedback>
+                ) : history.length > 0 ? (
+                    <View style={styles.historyContainer}>
+                        <Text style={styles.sectionTitle}>Recent Searches</Text>
+                        <FlatList
+                            data={history}
+                            keyExtractor={(item) => item}
+                            renderItem={({ item }) => (
+                                <View style={styles.historyItem}>
+                                    <TouchableOpacity
+                                        style={styles.historyTextContainer}
+                                        onPress={() => handleHistoryPress(item)}
+                                    >
+                                        <ReplayIcon size={20} color={colors.textSecondary} />
+                                        <Text style={styles.historyText}>{item}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => removeFromHistory(item)} style={styles.removeHistoryBtn}>
+                                        <CloseIcon size={18} color={colors.textMuted} />
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+                            contentContainerStyle={styles.listContent}
+                            keyboardShouldPersistTaps="handled"
+                        />
+                    </View>
                 ) : (
                     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                         <View style={styles.center}>
@@ -193,5 +230,39 @@ const styles = StyleSheet.create({
     emptyText: {
         fontSize: typography.sizes.md,
         color: colors.textSecondary,
+        fontFamily: typography.fonts.regular,
+    },
+    historyContainer: {
+        flex: 1,
+    },
+    sectionTitle: {
+        fontSize: typography.sizes.md,
+        fontFamily: typography.fonts.bold,
+        color: colors.textPrimary,
+        marginLeft: spacing.lg,
+        marginTop: spacing.md,
+        marginBottom: spacing.sm,
+    },
+    historyItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.surface,
+    },
+    historyTextContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    historyText: {
+        fontSize: typography.sizes.md,
+        fontFamily: typography.fonts.regular,
+        color: colors.textPrimary,
+        marginLeft: spacing.md,
+    },
+    removeHistoryBtn: {
+        padding: spacing.sm,
     },
 });

@@ -38,8 +38,13 @@ export function SearchBar({
                     returnKeyType="search"
                 />
                 {value.length > 0 && (
-                    <TouchableOpacity onPress={onClear} activeOpacity={0.7} style={styles.clearButton}>
-                        <CloseIcon size={18} color={colors.textMuted} />
+                    <TouchableOpacity
+                        onPress={onClear}
+                        activeOpacity={0.7}
+                        style={styles.clearButton}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    >
+                        <CloseIcon size={20} color={colors.textMuted} />
                     </TouchableOpacity>
                 )}
             </View>

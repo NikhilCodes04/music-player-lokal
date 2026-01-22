@@ -46,8 +46,8 @@ export function useSearch(query: string, type: SearchFilter): UseSearchResult {
         staleTime: 5 * 60 * 1000,
     });
 
-    // The flatMap will now naturally return SearchResultType[] because the pages are typed
-    const results = infinityQuery.data?.pages.flatMap(page => page.results) || [];
+    // Clear results if query is too short (disabled)
+    const results = enabled ? (infinityQuery.data?.pages.flatMap(page => page.results) || []) : [];
 
     return {
         results,
