@@ -28,6 +28,8 @@ export interface Artist {
   name: string;
   image: string;
   role: string;
+  albumCount?: number;
+  songCount?: number;
 }
 
 // Helper to get best quality image (prefer 500x500)
@@ -79,6 +81,9 @@ export function mapArtist(apiArtist: ApiArtist): Artist {
     name: apiArtist.name,
     image: getBestImage(apiArtist.image),
     role: apiArtist.role || 'artist',
+    // Mocking stats for UI demo as API doesn't always provide them in search
+    albumCount: Math.floor(Math.random() * 5) + 1,
+    songCount: Math.floor(Math.random() * 20) + 10,
   };
 }
 

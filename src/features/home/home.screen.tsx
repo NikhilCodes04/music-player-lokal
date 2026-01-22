@@ -19,8 +19,11 @@ import {
     AppHeader,
     SectionHeader,
     HorizontalCard,
-    HorizontalArtistCard
+    HorizontalArtistCard,
+    MoreVerticalIcon
 } from '../../shared/components';
+import { ArtistOptionsModal } from '../../shared/components/ArtistOptionsModal';
+import { SortOptionsModal, SortOption } from '../../shared/components/SortOptionsModal';
 import { colors, spacing, typography, borderRadius } from '../../shared/theme';
 
 const { width } = Dimensions.get('window');
@@ -164,23 +167,68 @@ function SuggestedTab() {
     );
 }
 
+
+
 function SongsTab() {
     const { songs, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error } = useHomeSongs();
+    const [sortOption, setSortOption] = useState<SortOption>('Ascending');
+    const [modalVisible, setModalVisible] = useState(false);
 
     if (isLoading) return <LoadingView />;
     if (error) return <ErrorView onRetry={() => fetchNextPage()} error={error?.message} />;
 
+    // Client-side sort (demo purpose, ideally API managed)
+    const sortedSongs = React.useMemo(() => {
+        if (!songs) return [];
+        const sorted = [...songs];
+        switch (sortOption) {
+            case 'Ascending':
+                return sorted.sort((a, b) => a.title.localeCompare(b.title));
+            case 'Descending':
+                return sorted.sort((a, b) => b.title.localeCompare(a.title));
+            case 'Artist':
+                return sorted.sort((a, b) => a.artist.localeCompare(b.artist));
+            case 'Album':
+                return sorted.sort((a, b) => (a.album || '').localeCompare(b.album || ''));
+            // Others like Year, Date Added require metadata field not present in simple mock
+            default:
+                return sorted;
+        }
+    }, [songs, sortOption]);
+
     return (
-        <FlatList
-            data={songs}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <SongItem song={item} onPress={() => handlePlaySong(item)} />}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
-            onEndReached={() => hasNextPage && fetchNextPage()}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
-        />
+        <View style={{ flex: 1 }}>
+            {/* Songs Header */}
+            <View style={styles.tabHeader}>
+                <Text style={styles.tabHeaderTitle}>{songs.length} songs</Text>
+                <TouchableOpacity
+                    style={styles.sortButton}
+                    onPress={() => setModalVisible(true)}
+                >
+                    <Text style={styles.sortText}>{sortOption}</Text>
+                    {/* Reusing existing icon or simple placeholder */}
+                    <MoreVerticalIcon size={16} color={colors.primary} />
+                </TouchableOpacity>
+            </View>
+
+            <FlatList
+                data={sortedSongs}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => <SongItem song={item} onPress={() => handlePlaySong(item)} />}
+                contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
+                onEndReached={() => hasNextPage && fetchNextPage()}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
+            />
+
+            <SortOptionsModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                currentSort={sortOption}
+                onSelectSort={setSortOption}
+            />
+        </View>
     );
 }
 
@@ -421,23 +469,59 @@ const styles = StyleSheet.create({
         color: colors.textMuted,
     },
     albumItem: {
-        marginBottom: spacing.lg,
+        marginBottom: spacing.xl,
         marginRight: spacing.lg,
     },
     albumArtwork: {
-        borderRadius: borderRadius.md,
+        borderRadius: borderRadius.lg,
         backgroundColor: colors.surface,
         marginBottom: spacing.sm,
     },
+    albumDetailsRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+    },
     albumName: {
-        fontSize: typography.sizes.md,
-        fontWeight: typography.weights.medium,
+        fontSize: typography.sizes.lg, // Bigger as per design
+        fontWeight: typography.weights.bold,
         color: colors.textPrimary,
-        marginBottom: spacing.xs,
+        marginBottom: 2,
     },
     albumArtist: {
         fontSize: typography.sizes.sm,
         color: colors.textSecondary,
+        marginBottom: 2,
+    },
+    songCount: {
+        fontSize: typography.sizes.xs,
+        color: colors.textSecondary,
+    },
+    menuIcon: {
+        paddingLeft: spacing.xs,
+        marginTop: 4,
+    },
+    tabHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: spacing.lg,
+        paddingBottom: spacing.md,
+    },
+    tabHeaderTitle: {
+        fontSize: typography.sizes.lg,
+        fontWeight: typography.weights.bold,
+        color: colors.textPrimary,
+    },
+    sortButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    sortText: {
+        fontSize: typography.sizes.sm,
+        color: colors.primary, // Orange as per design
+        marginRight: spacing.xs,
+        fontWeight: typography.weights.medium,
     },
     artistItem: {
         alignItems: 'center',
@@ -481,5 +565,31 @@ const styles = StyleSheet.create({
     retryText: {
         color: colors.textOnPrimary,
         fontWeight: typography.weights.semibold,
+    },
+    artistListRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: spacing.lg,
+        paddingVertical: spacing.xs,
+    },
+    artistListImage: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        marginRight: spacing.md,
+        backgroundColor: colors.surface,
+    },
+    artistListInfo: {
+        flex: 1,
+    },
+    artistNameList: {
+        fontSize: typography.sizes.lg,
+        fontWeight: typography.weights.bold,
+        color: colors.textPrimary,
+        marginBottom: 2,
+    },
+    artistStats: {
+        fontSize: typography.sizes.sm,
+        color: colors.textSecondary,
     },
 });
