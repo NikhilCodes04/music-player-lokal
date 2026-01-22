@@ -6,11 +6,14 @@ import { QueryProvider } from './providers/QueryProvider';
 import { PlayerProvider } from './providers/PlayerProvider';
 import { RootNavigator } from './navigation/RootNavigator';
 
+import { PlayerEventsListener } from '../features/player/PlayerEventsListener';
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <QueryProvider>
         <PlayerProvider>
+          <PlayerEventsListener />
           <NavigationContainer>
             <RootNavigator />
           </NavigationContainer>
