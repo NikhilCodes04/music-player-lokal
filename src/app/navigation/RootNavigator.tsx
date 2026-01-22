@@ -9,6 +9,7 @@ import { SearchScreen } from '../../features/search/search.screen';
 import { PlayerScreen } from '../../features/player/PlayerScreen';
 
 import { QueueScreen } from '../../features/queue/QueueScreen';
+import { ArtistDetailsScreen } from '../../features/artist/ArtistDetailsScreen';
 
 const Stack = createStackNavigator();
 
@@ -25,6 +26,10 @@ export function RootNavigator() {
                     gestureEnabled: true,
                     // Setup for full screen modal feel
                 }}
+            />
+            <Stack.Screen
+                name="ArtistDetails"
+                component={ArtistDetailsScreen}
             />
             <Stack.Screen
                 name="Queue"

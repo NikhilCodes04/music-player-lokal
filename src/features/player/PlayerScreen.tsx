@@ -108,7 +108,9 @@ export function PlayerScreen() {
             {/* Track Info */}
             <View style={styles.trackInfo}>
                 <Text style={styles.title} numberOfLines={1}>{currentTrack.title}</Text>
-                <Text style={styles.artist} numberOfLines={1}>{currentTrack.artist}</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('ArtistDetails', { artist: currentTrack?.artist })}>
+                    <Text style={styles.artist} numberOfLines={1}>{currentTrack.artist}</Text>
+                </TouchableOpacity>
             </View>
 
             {/* Progress */}
