@@ -13,6 +13,7 @@ A production-grade music streaming application built with **React Native (Expo)*
     - **Mini Player**: Persistent playback bar visible across the app.
     - **Background Playback**: Continues playing audio when the app is backgrounded.
 - **Queue Management**: Single global queue with replace-and-play behavior.
+- **Details Screens**: Dedicated views for Albums and Artists providing deep dives into discographies and tracklists.
 - **Offline Capabilities**: Architecture supports local file paths (though full download manager is out of scope).
 
 ---
@@ -43,7 +44,9 @@ src/
  │   ├─ home/
  │   ├─ search/
  │   ├─ player/
- │   └─ queue/
+ │   ├─ queue/
+ │   ├─ album/
+ │   └─ artist/
  ├─ services/            # API clients and external service integrations
  ├─ shared/              # Reusable components, theme, and utilities
  └─ storage/             # MMKV storage instances and keys
