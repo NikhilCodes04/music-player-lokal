@@ -16,6 +16,7 @@ import {
     FilterPill,
     SearchResultItem
 } from '../../shared/components';
+import { MiniPlayer } from '../../features/player/MiniPlayer';
 import { CloseIcon, ReplayIcon } from '../../shared/components/Icons';
 import { useDebounce } from '../../shared/hooks/useDebounce';
 import { useRecentSearches } from './useRecentSearches';
@@ -23,6 +24,7 @@ import { useSearch } from './search.hooks';
 import type { SearchFilter } from './search.types';
 import type { Song, Album, Artist } from '../../services/saavn.mappers';
 import { colors, spacing, typography } from '../../shared/theme/colors';
+import { usePlayerStore } from '../../features/player/player.store';
 
 const FILTERS: { label: string; value: SearchFilter }[] = [
     { label: 'Songs', value: 'songs' },
@@ -44,7 +46,11 @@ export function SearchScreen() {
         isFetchingNextPage
     } = useSearch(debouncedQuery, activeFilter);
 
+    // deleted misplaced import
+
+    // ... inside component
     const { history, addToHistory, removeFromHistory, clearHistory } = useRecentSearches();
+    const { playTrack } = usePlayerStore();
 
     const handleClear = () => {
         setQuery('');
@@ -62,7 +68,18 @@ export function SearchScreen() {
             if ('title' in item && item.title) addToHistory(item.title);
             else if ('name' in item && item.name) addToHistory(item.name);
         }
-        console.log('Press', item.id);
+
+        if ('title' in item) {
+            // It's a song, play it
+            playTrack({
+                id: item.id,
+                url: item.url || '',
+                title: item.title,
+                artist: item.artist,
+                artwork: item.artwork,
+                duration: item.duration || 0,
+            });
+        }
     };
 
     const handleHistoryPress = (term: string) => {
@@ -115,7 +132,19 @@ export function SearchScreen() {
                 subtitle={subtitle}
                 image={image}
                 onPress={() => handleResultPress(item)}
-                onPlayPress={() => console.log('Play', item.id)}
+                onPlayPress={() => {
+                    if ('title' in item) {
+                        const song = item as Song;
+                        playTrack({
+                            id: song.id,
+                            url: song.url || '',
+                            title: song.title,
+                            artist: song.artist,
+                            artwork: song.artwork,
+                            duration: song.duration || 0,
+                        });
+                    }
+                }}
                 onOptionsPress={() => console.log('Options', item.id)}
             />
         );
@@ -211,6 +240,9 @@ export function SearchScreen() {
                         </View>
                     </TouchableWithoutFeedback>
                 )}
+            </View>
+            <View style={{ paddingBottom: insets.bottom }}>
+                <MiniPlayer />
             </View>
         </View>
     );

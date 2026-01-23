@@ -10,6 +10,7 @@ import {
     ShuffleIcon,
     PlayIcon
 } from '../../shared/components';
+import { MiniPlayer } from '../player/MiniPlayer';
 import { usePlayerStore } from '../player/player.store';
 import type { Track } from '../player/player.types';
 import type { Artist } from '../../services/saavn.mappers';
@@ -144,6 +145,9 @@ export function ArtistDetailsScreen() {
                     {tracks.map((track, i) => renderSongItem(track, i))}
                 </View>
             </ScrollView>
+            <View style={{ paddingBottom: insets.bottom }}>
+                <MiniPlayer />
+            </View>
         </View>
     );
 }
