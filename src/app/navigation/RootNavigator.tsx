@@ -10,6 +10,7 @@ import { PlayerScreen } from '../../features/player/PlayerScreen';
 
 import { QueueScreen } from '../../features/queue/QueueScreen';
 import { ArtistDetailsScreen } from '../../features/artist/ArtistDetailsScreen';
+import { AlbumDetailsScreen } from '../../features/album/AlbumDetailsScreen';
 
 const Stack = createStackNavigator();
 
@@ -30,6 +31,10 @@ export function RootNavigator() {
             <Stack.Screen
                 name="ArtistDetails"
                 component={ArtistDetailsScreen}
+            />
+            <Stack.Screen
+                name="AlbumDetails"
+                component={AlbumDetailsScreen}
             />
             <Stack.Screen
                 name="Queue"

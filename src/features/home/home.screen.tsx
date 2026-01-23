@@ -234,6 +234,7 @@ function SongsTab() {
 }
 
 function AlbumsTab() {
+    const navigation = useNavigation<any>();
     const { albums, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error } = useHomeAlbums();
 
     if (isLoading) return <LoadingView />;
@@ -243,7 +244,7 @@ function AlbumsTab() {
         <FlatList
             data={albums}
             keyExtractor={(item, index) => `${item.id}-${index}`}
-            renderItem={({ item }) => <AlbumItem album={item} onPress={() => handleAlbumPress(item)} />}
+            renderItem={({ item }) => <AlbumItem album={item} onPress={() => handleAlbumPress(item, navigation)} />}
             numColumns={2}
             contentContainerStyle={styles.gridContent}
             showsVerticalScrollIndicator={false}
@@ -431,8 +432,8 @@ function handlePlaySong(song: Song) {
     });
 }
 
-function handleAlbumPress(album: Album) {
-    console.log('Navigate to album:', album.name);
+function handleAlbumPress(album: Album, navigation: any) {
+    navigation.navigate('AlbumDetails', { album });
 }
 
 function handleArtistPress(artist: Artist, navigation: any) {
