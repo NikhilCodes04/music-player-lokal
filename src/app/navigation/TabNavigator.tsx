@@ -8,7 +8,7 @@ import { PlaylistsScreen } from '../../features/playlists/playlists.screen';
 import { SettingsScreen } from '../../features/settings/settings.screen';
 import { SearchScreen } from '../../features/search/search.screen';
 import { HomeIcon, HeartIcon, PlaylistIcon, SettingsIcon } from '../../shared/components';
-import { colors, spacing } from '../../shared/theme';
+import { colors, spacing, typography } from '../../shared/theme';
 
 const Tab = createBottomTabNavigator();
 
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     },
     tabLabel: {
         fontSize: 10,
-        fontWeight: '500',
+        fontFamily: typography.fonts.medium,
         marginTop: 4,
     },
 });

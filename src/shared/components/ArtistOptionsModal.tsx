@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Modal, TouchableOpacity, Image, StyleSheet, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import { colors, spacing, borderRadius, typography } from '../theme';
 import { PlayIcon, SkipNextIcon, PlaylistIcon, CastIcon, CloseIcon } from './Icons';
-import { Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Feather, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import type { Artist } from '../../services/saavn.mappers';
 
 interface ArtistOptionsModalProps {
@@ -43,12 +43,12 @@ export function ArtistOptionsModal({ visible, onClose, artist }: ArtistOptionsMo
 
                             {/* Options List */}
                             <OptionItem
-                                icon={<FontAwesome name="play-circle-o" size={24} color={colors.textPrimary} />}
+                                icon={<Ionicons name="play-circle-outline" size={24} color={colors.textPrimary} />}
                                 label="Play"
                                 onPress={onClose}
                             />
                             <OptionItem
-                                icon={<MaterialIcons name="skip-next" size={24} color={colors.textPrimary} />}
+                                icon={<Ionicons name="arrow-forward-circle-outline" size={24} color={colors.textPrimary} />}
                                 label="Play Next"
                                 onPress={onClose}
                             />
@@ -58,12 +58,12 @@ export function ArtistOptionsModal({ visible, onClose, artist }: ArtistOptionsMo
                                 onPress={onClose}
                             />
                             <OptionItem
-                                icon={<FontAwesome name="plus-square-o" size={24} color={colors.textPrimary} />}
+                                icon={<Feather name="plus-circle" size={24} color={colors.textPrimary} />}
                                 label="Add to Playlist"
                                 onPress={onClose}
                             />
                             <OptionItem
-                                icon={<Feather name="share" size={24} color={colors.textPrimary} />}
+                                icon={<Ionicons name="paper-plane-outline" size={24} color={colors.textPrimary} />}
                                 label="Share"
                                 onPress={onClose}
                             />
@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
     },
     container: {
         backgroundColor: colors.background,
-        borderTopLeftRadius: borderRadius.xl,
-        borderTopRightRadius: borderRadius.xl,
+        borderTopLeftRadius: 32, // More rounded as requested
+        borderTopRightRadius: 32, // More rounded as requested
         paddingBottom: spacing.xxxl,
         paddingHorizontal: spacing.xl,
     },
@@ -110,11 +110,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: spacing.lg,
+        paddingLeft: spacing.xs, // Move artwork slightly right
     },
     artwork: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
+        width: 64, // Bigger as requested (was 56)
+        height: 64, // Bigger as requested (was 56)
+        borderRadius: 32,
         marginRight: spacing.md,
     },
     headerInfo: {
@@ -122,12 +123,13 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: typography.sizes.lg,
-        fontWeight: typography.weights.bold,
+        fontFamily: typography.fonts.bold, // Consistent font
         color: colors.textPrimary,
         marginBottom: 2,
     },
     subtitle: {
         fontSize: typography.sizes.sm,
+        fontFamily: typography.fonts.regular, // Consistent font
         color: colors.textSecondary,
     },
     divider: {
@@ -147,7 +149,7 @@ const styles = StyleSheet.create({
     },
     optionLabel: {
         fontSize: typography.sizes.md,
-        fontWeight: typography.weights.medium,
+        fontFamily: typography.fonts.medium, // Consistent font
         color: colors.textPrimary,
     },
 });

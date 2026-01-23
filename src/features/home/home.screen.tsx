@@ -78,6 +78,7 @@ export function HomeScreen() {
 // --- Tab Components ---
 
 function SuggestedTab() {
+    const navigation = useNavigation<any>();
     const { songs: suggestedSongs, isLoading: isSongsLoading, isError: isSongsError, refetch: refetchSongs } = useSuggestedFeed();
     const { artists, isLoading: isArtistsLoading } = useHomeArtists();
 
@@ -133,7 +134,7 @@ function SuggestedTab() {
                         <HorizontalArtistCard
                             name={item.name}
                             image={item.image}
-                            onPress={() => handleArtistPress(item)}
+                            onPress={() => handleArtistPress(item, navigation)}
                         />
                     )}
                     contentContainerStyle={styles.horizontalListContent}
@@ -174,9 +175,6 @@ function SongsTab() {
     const [sortOption, setSortOption] = useState<SortOption>('Ascending');
     const [modalVisible, setModalVisible] = useState(false);
 
-    if (isLoading) return <LoadingView />;
-    if (error) return <ErrorView onRetry={() => fetchNextPage()} error={error?.message} />;
-
     // Client-side sort (demo purpose, ideally API managed)
     const sortedSongs = React.useMemo(() => {
         if (!songs) return [];
@@ -196,6 +194,9 @@ function SongsTab() {
         }
     }, [songs, sortOption]);
 
+    if (isLoading) return <LoadingView />;
+    if (error) return <ErrorView onRetry={() => fetchNextPage()} error={error?.message} />;
+
     return (
         <View style={{ flex: 1 }}>
             {/* Songs Header */}
@@ -213,7 +214,7 @@ function SongsTab() {
 
             <FlatList
                 data={sortedSongs}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item, index) => `${item.id}-${index}`}
                 renderItem={({ item }) => <SongItem song={item} onPress={() => handlePlaySong(item)} />}
                 contentContainerStyle={styles.listContent}
                 showsVerticalScrollIndicator={false}
@@ -241,7 +242,7 @@ function AlbumsTab() {
     return (
         <FlatList
             data={albums}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item, index) => `${item.id}-${index}`}
             renderItem={({ item }) => <AlbumItem album={item} onPress={() => handleAlbumPress(item)} />}
             numColumns={2}
             contentContainerStyle={styles.gridContent}
@@ -253,24 +254,76 @@ function AlbumsTab() {
     );
 }
 
-function ArtistsTab() {
-    const { artists, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error } = useHomeArtists();
+const ARTIST_SORT_OPTIONS: SortOption[] = ['Date Added', 'Name', 'Most Played'];
 
-    if (isLoading) return <LoadingView />;
-    if (error) return <ErrorView onRetry={() => fetchNextPage()} error={error?.message} />;
+function ArtistsTab() {
+    const navigation = useNavigation<any>();
+    const { artists, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, error } = useHomeArtists();
+    const [sortOption, setSortOption] = useState<SortOption>('Date Added');
+    const [modalVisible, setModalVisible] = useState(false);
+
+    // Artist Options Modal State
+    const [optionsModalVisible, setOptionsModalVisible] = useState(false);
+    const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
+
+    const handleOpenOptions = (artist: Artist) => {
+        setSelectedArtist(artist);
+        setOptionsModalVisible(true);
+    };
 
     return (
-        <FlatList
-            data={artists}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <ArtistItem artist={item} onPress={() => handleArtistPress(item)} />}
-            numColumns={3}
-            contentContainerStyle={styles.gridContent}
-            showsVerticalScrollIndicator={false}
-            onEndReached={() => hasNextPage && fetchNextPage()}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
-        />
+        <View style={{ flex: 1 }}>
+            {isLoading ? (
+                <LoadingView />
+            ) : error ? (
+                <ErrorView onRetry={() => fetchNextPage()} error={error?.message} />
+            ) : (
+                <>
+                    {/* Artists Header */}
+                    <View style={styles.tabHeader}>
+                        <Text style={styles.tabHeaderTitle}>{artists ? artists.length : 0} artists</Text>
+                        <TouchableOpacity
+                            style={styles.sortButton}
+                            onPress={() => setModalVisible(true)}
+                        >
+                            <Text style={styles.sortText}>{sortOption}</Text>
+                            <MoreVerticalIcon size={16} color={colors.primary} />
+                        </TouchableOpacity>
+                    </View>
+
+                    <FlatList
+                        data={artists}
+                        keyExtractor={(item, index) => `${item.id}-${index}`}
+                        renderItem={({ item }) => (
+                            <ArtistListItem
+                                artist={item}
+                                onPress={() => handleArtistPress(item, navigation)}
+                                onOptionPress={() => handleOpenOptions(item)}
+                            />
+                        )}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                        onEndReached={() => hasNextPage && fetchNextPage()}
+                        onEndReachedThreshold={0.5}
+                        ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={colors.primary} /> : null}
+                    />
+                </>
+            )}
+
+            <SortOptionsModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                currentSort={sortOption}
+                onSelectSort={setSortOption}
+                options={ARTIST_SORT_OPTIONS}
+            />
+
+            <ArtistOptionsModal
+                visible={optionsModalVisible}
+                onClose={() => setOptionsModalVisible(false)}
+                artist={selectedArtist}
+            />
+        </View>
     );
 }
 
@@ -312,17 +365,25 @@ function AlbumItem({ album, onPress }: AlbumItemProps) {
     );
 }
 
-interface ArtistItemProps {
+interface ArtistListItemProps {
     artist: Artist;
     onPress: () => void;
+    onOptionPress: () => void;
 }
 
-function ArtistItem({ artist, onPress }: ArtistItemProps) {
-    const itemWidth = (width - 64) / 3;
+function ArtistListItem({ artist, onPress, onOptionPress }: ArtistListItemProps) {
     return (
-        <TouchableOpacity style={[styles.artistItem, { width: itemWidth }]} onPress={onPress} activeOpacity={0.7}>
-            <Image source={{ uri: artist.image }} style={[styles.artistImage, { width: itemWidth - 8, height: itemWidth - 8 }]} />
-            <Text style={styles.artistName} numberOfLines={1}>{artist.name}</Text>
+        <TouchableOpacity style={styles.artistListRow} onPress={onPress} activeOpacity={0.7}>
+            <Image source={{ uri: artist.image }} style={styles.artistListImage} />
+            <View style={styles.artistListInfo}>
+                <Text style={styles.artistNameList} numberOfLines={1}>{artist.name}</Text>
+                <Text style={styles.artistStats}>
+                    {artist.albumCount || 0} Albums  |  {artist.songCount || 0} Songs
+                </Text>
+            </View>
+            <TouchableOpacity style={styles.menuIcon} onPress={onOptionPress}>
+                <MoreVerticalIcon size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
         </TouchableOpacity>
     );
 }
@@ -374,8 +435,8 @@ function handleAlbumPress(album: Album) {
     console.log('Navigate to album:', album.name);
 }
 
-function handleArtistPress(artist: Artist) {
-    console.log('Navigate to artist:', artist.name);
+function handleArtistPress(artist: Artist, navigation: any) {
+    navigation.navigate('ArtistDetails', { artist });
 }
 
 // --- Styles ---

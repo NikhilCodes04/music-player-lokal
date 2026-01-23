@@ -3,16 +3,17 @@ import { View, Text, Modal, TouchableOpacity, StyleSheet, TouchableWithoutFeedba
 import { colors, spacing, borderRadius, typography } from '../theme';
 import { MaterialIcons } from '@expo/vector-icons';
 
-export type SortOption = 'Ascending' | 'Descending' | 'Artist' | 'Album' | 'Year' | 'Date Added' | 'Date Modified' | 'Composer';
+export type SortOption = 'Ascending' | 'Descending' | 'Artist' | 'Album' | 'Year' | 'Date Added' | 'Date Modified' | 'Composer' | 'Name' | 'Most Played';
 
 interface SortOptionsModalProps {
     visible: boolean;
     onClose: () => void;
     currentSort: SortOption;
     onSelectSort: (option: SortOption) => void;
+    options?: SortOption[];
 }
 
-const SORT_OPTIONS: SortOption[] = [
+const DEFAULT_SORT_OPTIONS: SortOption[] = [
     'Ascending',
     'Descending',
     'Artist',
@@ -23,7 +24,9 @@ const SORT_OPTIONS: SortOption[] = [
     'Composer'
 ];
 
-export function SortOptionsModal({ visible, onClose, currentSort, onSelectSort }: SortOptionsModalProps) {
+export function SortOptionsModal({ visible, onClose, currentSort, onSelectSort, options }: SortOptionsModalProps) {
+    const displayOptions = options || DEFAULT_SORT_OPTIONS;
+
     return (
         <Modal
             visible={visible}
@@ -35,7 +38,7 @@ export function SortOptionsModal({ visible, onClose, currentSort, onSelectSort }
                 <View style={styles.overlay}>
                     <TouchableWithoutFeedback>
                         <View style={styles.container}>
-                            {SORT_OPTIONS.map((option) => (
+                            {displayOptions.map((option) => (
                                 <TouchableOpacity
                                     key={option}
                                     style={styles.optionRow}
